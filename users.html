@@ -1,0 +1,436 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Admin Dashboard</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: Arial, sans-serif; background-color: #fff; }
+    .container { display: flex; min-height: 100vh; }
+
+    .sidebar {
+      display: flex;
+      flex-direction: column;
+      width: 220px;
+      background-color: #328E6E;
+      padding: 20px;
+      color: #fff;
+      position: fixed;
+      top: 0;
+      left: 0;
+      bottom: 0;
+    }
+    .sidebar h2 { margin-bottom: 20px; }
+    .sidebar ul { list-style: none; }
+    .sidebar ul li {
+      cursor: pointer;
+      font-size: 18px;
+      padding: 10px;
+      border-radius: 5px;
+    }
+    .sidebar ul li:hover, .sidebar ul li.active {
+      background-color: #fff;
+      color: #328E6E;
+      font-weight: bold;
+    }
+    .logout-button {
+      margin-top: auto;
+      padding: 10px;
+      background-color: #4CAF50;
+      border: none;
+      color: #fff;
+      width: 100%;
+      text-align: center;
+      cursor: pointer;
+      border-radius: 5px;
+      transition: background-color 0.3s ease;
+    }
+    .logout-button:hover { background-color: darkgreen; }
+
+    .main {
+      margin-left: 220px;
+      padding: 40px;
+      flex-grow: 1;
+      background-color: transparent;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    .button {
+      background-color: #f4f4f4;
+      padding: 15px 25px;
+      border-radius: 10px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-weight: bold;
+      color: #2c7a60;
+      font-size: 18px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+      cursor: pointer;
+    }
+
+    .arrow { font-size: 22px; }
+
+    .modal {
+      display: none;
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background: rgba(0,0,0,0.5);
+      justify-content: center;
+      align-items: center;
+      z-index: 1000;
+    }
+    .modal-content {
+      background: white;
+      padding: 20px;
+      border-radius: 10px;
+      width: 90%;
+      max-width: 600px;
+      max-height: 80vh;
+      overflow-y: auto;
+    }
+    .modal-content h3 {
+      margin-bottom: 10px;
+    }
+    .modal-content input, .modal-content select {
+      margin: 5px 0;
+      padding: 8px;
+      width: 100%;
+    }
+    .modal-content button {
+      margin-top: 10px;
+      padding: 8px 12px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+    .close-button {
+      float: right;
+      cursor: pointer;
+      font-weight: bold;
+      font-size: 20px;
+      color: red;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 10px;
+    }
+    th, td {
+      border: 1px solid #ccc;
+      padding: 8px;
+      text-align: left;
+    }
+    th {
+      background-color: #555;
+      color: white;
+    }
+    /* Capsule Switch Styles */
+  .switch {
+    position: relative;
+    display: inline-block;
+    width: 50px;
+    height: 26px;
+  }
+
+  .switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+  }
+
+  .slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background-color: #ccc;
+    transition: 0.4s;
+    border-radius: 34px;
+  }
+
+  .slider::before {
+    position: absolute;
+    content: "";
+    height: 20px;
+    width: 20px;
+    left: 3px;
+    bottom: 3px;
+    background-color: white;
+    transition: 0.4s;
+    border-radius: 50%;
+  }
+
+  .switch input:checked + .slider {
+    background-color: #4CAF50;
+  }
+
+  .switch input:checked + .slider::before {
+    transform: translateX(24px);
+  }
+
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <!-- Sidebar -->
+    <div class="sidebar">
+      <h2>Dashboard</h2>
+    <ul>
+      <li class="monitor" onclick="monitor()">🏠 Monitoring</li>
+      <li class="active">👥 Users</li>
+      <li class="products" onclick="products()">🍕 Products</li>
+      <li class="inventory" onclick="inventory()">📦 Inventory</li>
+      <li class="supply" onclick="supply()">📋 Supply List</li>
+      <li class="transact" onclick="transact()">💳 Transactions</li>
+      <li class="sales" onclick="sales()">📈 Sales Report</li>
+      <li class="control" onclick="control()">🧭 Controlling</li>
+      <li class="settings" onclick="settings()">⚙️ Settings</li>
+    </ul>
+    <button class="logout-button" onclick="logout()">↩️ Logout</button>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main">
+      <div class="button" id="allUsersBtn">
+        <span><img src="https://img.icons8.com/emoji/48/000000/boy-emoji.png"/> All Users</span>
+        <span class="arrow">➡️</span>
+      </div>
+      <div class="button" id="manageUsersBtn">
+        <span><img src="https://img.icons8.com/ios-filled/30/user-group-man-man--v2.png"/> Add / Delete User</span>
+        <span class="arrow">➡️</span>
+      </div>
+      <div class="button" id="rolesBtn">
+        <span><img src="https://img.icons8.com/color/48/group-background-selected.png"/> Roles and Permission</span>
+        <span class="arrow">➡️</span>
+      </div>
+      <div class="button" id="activityBtn">
+        <span><img src="https://img.icons8.com/color/48/activity-history.png"/> User Activity Logs</span>
+        <span class="arrow">➡️</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- All Users Modal -->
+  <div id="allUsersModal" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        All Users
+        <span class="close-btn" onclick="toggleModal('allUsersModal', false)">❌</span>
+      </div>
+      <div class="modal-body">
+        <table>
+          <thead>
+            <tr><th>ID</th><th>Name</th><th>Email</th><th>Role</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>1</td><td>Admin</td><td>admin@example.com</td><td>Admin</td></tr>
+            <tr><td>2</td><td>John Doe</td><td>john@example.com</td><td>User</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- Manage Users Modal -->
+  <div id="manageUsersModal" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        Add / Delete Users
+        <span class="close-btn" onclick="toggleModal('manageUsersModal', false)">❌</span>
+      </div>
+      <div class="modal-body">
+        <div class="form-group">
+          <input type="text" id="nameInput" class="form-input" placeholder="Full Name" />
+        </div>
+        <div class="form-group">
+          <input type="email" id="emailInput" class="form-input" placeholder="Email Address" />
+        </div>
+        <div class="form-group">
+          <select id="roleInput" class="form-input">
+            <option value="">Select Role</option>
+            <option value="admin">Admin</option>
+            <option value="user">User</option>
+          </select>
+        </div>
+        <div class="form-actions">
+          <button class="add-btn" onclick="addUser()">➕ Add User</button>
+          <button class="del-btn" onclick="deleteUser()">🗑️ Delete User</button>
+        </div>
+
+        <hr style="margin: 20px 0;" />
+        <table id="userTable">
+          <thead>
+            <tr><th>Name</th><th>Email</th><th>Role</th></tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+  <!-- Roles Modal -->
+  <div id="rolesModal" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        Roles and Permission
+        <span class="close-btn" onclick="toggleModal('rolesModal', false)">❌</span>
+      </div>
+      <div class="modal-body">
+        <table>
+          <thead>
+            <tr><th></th><th>Admin</th><th>User</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>Monitoring</td><td><label class="switch"><input type="checkbox" checked><span class="slider"></span></label></td><td><label class="switch"><input type="checkbox"><span class="slider"></span></label></td></tr>
+            <tr><td>Users</td><td><label class="switch"><input type="checkbox" checked><span class="slider"></span></label></td><td><label class="switch"><input type="checkbox"><span class="slider"></span></label></td></tr>
+            <tr><td>Products</td><td><label class="switch"><input type="checkbox" checked><span class="slider"></span></label></td><td><label class="switch"><input type="checkbox" checked><span class="slider"></span></label></td></tr>
+            <tr><td>Inventory</td><td><label class="switch"><input type="checkbox" checked><span class="slider"></span></label></td><td><label class="switch"><input type="checkbox"><span class="slider"></span></label></td></tr>
+            <tr><td>Supply List</td><td><label class="switch"><input type="checkbox" checked><span class="slider"></span></label></td><td><label class="switch"><input type="checkbox"><span class="slider"></span></label></td></tr>
+            <tr><td>Transactions</td><td><label class="switch"><input type="checkbox" checked><span class="slider"></span></label></td><td><label class="switch"><input type="checkbox"><span class="slider"></span></label></td></tr>
+            <tr><td>Sales Report</td><td><label class="switch"><input type="checkbox" checked><span class="slider"></span></label></td><td><label class="switch"><input type="checkbox" checked><span class="slider"></span></label></td></tr>
+            <tr><td>Controlling</td><td><label class="switch"><input type="checkbox" checked><span class="slider"></span></label></td><td><label class="switch"><input type="checkbox"><span class="slider"></span></label></td></tr>
+            <tr><td>Settings</td><td><label class="switch"><input type="checkbox" checked><span class="slider"></span></label></td><td><label class="switch"><input type="checkbox"><span class="slider"></span></label></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- Activity Logs Modal -->
+  <div id="activityModal" class="modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        User Activity Logs
+        <span class="close-btn" onclick="toggleModal('activityModal', false)">❌</span>
+      </div>
+      <div class="modal-body">
+        <div class="filter-bar">
+          <div class="search-box">
+            🔍 <input type="text" placeholder="Search...">
+          </div>
+          <div class="date-picker">
+            📅 <input type="text" value="04/15/2025 - 04/17/2025">
+          </div>
+        </div>
+        <table>
+          <thead>
+            <tr>
+              <th>Timestamp</th>
+              <th>Name</th>
+              <th>Action</th>
+              <th>Module</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><td>1:30 pm | 04/15/2025</td><td>Admin</td><td>Updated</td><td>Product</td></tr>
+            <tr><td>2:00 pm | 04/15/2025</td><td>Staff</td><td>View</td><td>Sales Report</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    function toggleModal(id, show) {
+      document.getElementById(id).style.display = show ? 'flex' : 'none';
+    }
+
+    document.getElementById('rolesBtn').addEventListener('click', () => toggleModal('rolesModal', true));
+    document.getElementById('activityBtn').addEventListener('click', () => toggleModal('activityModal', true));
+    document.getElementById('allUsersBtn').addEventListener('click', () => toggleModal('allUsersModal', true));
+    document.getElementById('manageUsersBtn').addEventListener('click', () => toggleModal('manageUsersModal', true));
+
+    function logout() {
+      window.location.href = "index.html";
+    }
+
+
+    function monitor() {
+      window.location.href = "admin-dashb.html";
+    }
+
+    function products() {
+      window.location.href = "admin-products.html";
+    }
+    function inventory() {
+      window.location.href = "inventory.html";
+    }
+    function supply() {
+      window.location.href = "supply.html";
+    }
+    function transact() {
+      window.location.href = "transact.html";
+    }
+    function sales() {
+      window.location.href = "sales.html";
+    }
+    function control() {
+      window.location.href = "control.html";
+    }
+    function settings() {
+      window.location.href = "settings.html";
+    }
+
+   let users = [];
+
+    function addUser() {
+      const name = document.getElementById('nameInput').value.trim();
+      const email = document.getElementById('emailInput').value.trim();
+      const role = document.getElementById('roleInput').value;
+
+      if (!name || !email || !role) {
+        alert('Please fill all fields.');
+        return;
+      }
+
+      if (users.some(user => user.email === email)) {
+        alert('User already exists with this email.');
+        return;
+      }
+
+      users.push({ name, email, role });
+      renderUsers();
+
+      document.getElementById('nameInput').value = '';
+      document.getElementById('emailInput').value = '';
+      document.getElementById('roleInput').value = '';
+    }
+
+    function deleteUser() {
+      const email = document.getElementById('emailInput').value.trim();
+      if (!email) {
+        alert('Enter an email to delete.');
+        return;
+      }
+
+      const originalLength = users.length;
+      users = users.filter(user => user.email !== email);
+
+      if (users.length === originalLength) {
+        alert('No user found with that email.');
+      } else {
+        alert('User deleted.');
+      }
+
+      renderUsers();
+      document.getElementById('emailInput').value = '';
+    }
+
+    function renderUsers() {
+      const tbody = document.querySelector('#userTable tbody');
+      tbody.innerHTML = '';
+
+      users.forEach(user => {
+        const row = document.createElement('tr');
+        row.innerHTML = `<td>${user.name}</td><td>${user.email}</td><td>${user.role}</td>`;
+        tbody.appendChild(row);
+      });
+    }
+  </script>
+
+</body>
+</html>

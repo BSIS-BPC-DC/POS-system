@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Admin Dashboard</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: Arial, sans-serif; background-color: #fff; }
+    .container { display: flex; min-height: 100vh; }
+
+    .sidebar {
+      display: flex;
+      flex-direction: column;
+      width: 220px;
+      background-color: #328E6E;
+      padding: 20px;
+      color: #fff;
+      position: fixed;
+      top: 0;
+      left: 0;
+      bottom: 0;
+    }
+    .sidebar h2 { margin-bottom: 20px; }
+    .sidebar ul { list-style: none; }
+    .sidebar ul li {
+      cursor: pointer;
+      font-size: 18px;
+      padding: 10px;
+      border-radius: 5px;
+    }
+    .sidebar ul li:hover, .sidebar ul li.active {
+      background-color: #fff;
+      color: #328E6E;
+      font-weight: bold;
+    }
+    .logout-button {
+      margin-top: auto;
+      padding: 10px;
+      background-color: #4CAF50;
+      border: none;
+      color: #fff;
+      width: 100%;
+      text-align: center;
+      cursor: pointer;
+      border-radius: 5px;
+      transition: background-color 0.3s ease;
+    }
+    .logout-button:hover { background-color: darkgreen; }
+
+    .main-content {
+      margin-left: 220px;
+      padding: 40px;
+      flex-grow: 1;
+      background-color: transparent;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    .top-bar {
+      background-color: transparent;
+      padding: 15px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      color: white;
+      font-weight: bold;
+    }
+    .top-bar button {
+      padding: 10px 20px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 14px;
+    }
+    .top-bar .add {
+      background-color: #4CAF50;
+      color: white;
+    }
+    .top-bar .delete {
+      background-color: #f44336;
+      color: white;
+    }
+
+    .product-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+      gap: 20px;
+      padding: 20px;
+      overflow-y: auto;
+      height: calc(100vh - 120px);
+    }
+    .product-card {
+      background: white;
+      border-radius: 10px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+      padding: 15px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    .product-card img {
+      width: 100px;
+      height: 100px;
+      object-fit: cover;
+      border-radius: 10px;
+    }
+    .product-type {
+      font-weight: bold;
+      color: orange;
+      margin-top: 10px;
+    }
+    .product-name {
+      font-size: 16px;
+      margin: 5px 0;
+    }
+    .product-price {
+      color: red;
+      font-weight: bold;
+    }
+
+    .modal {
+      display: none;
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background: rgba(0,0,0,0.5);
+      justify-content: center;
+      align-items: center;
+    }
+    .modal-content {
+      background: white;
+      padding: 20px;
+      border-radius: 10px;
+      width: 300px;
+    }
+    .modal-content input, .modal-content select {
+      width: 100%;
+      margin-bottom: 10px;
+      padding: 8px;
+    }
+    .modal-content button {
+      padding: 8px 12px;
+      margin-top: 10px;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <!-- Sidebar -->
+    <div class="sidebar">
+      <h2>Dashboard</h2>
+      <ul>
+        <li class="monitor" onclick="monitor()">🏠 Monitoring</li>
+        <li class="users" onclick="users()">👥 Users</li>
+        <li class="active" onclick="goToProducts()">🍕 Products</li>
+        <li class="inventory" onclick="inventory()">📦 Inventory</li>
+        <li class="supply" onclick="supply()">📋 Supply List</li>
+        <li class="transact" onclick="transact()">💳 Transactions</li>
+        <li class="sales" onclick="sales()">📈 Sales Report</li>
+        <li class="control" onclick="control()">🧭 Controlling</li>
+        <li class="settings" onclick="settings()">⚙️ Settings</li>
+      </ul>
+      <button class="logout-button" onclick="logout()">↩️ Logout</button>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content">
+      <div class="top-bar">
+        <button class="add" onclick="openAddModal()">+ Add</button>
+        <button class="delete" onclick="openDeleteModal()">× Del</button>
+      </div>
+      <div class="product-grid" id="productGrid">
+      </div>
+    </div>
+  </div>
+
+  <!-- Add Product Modal -->
+  <div class="modal" id="addModal">
+    <div class="modal-content">
+      <h3>Add Product</h3>
+      <input type="text" id="type" placeholder="Type (e.g., NON VEGAN)" />
+      <input type="text" id="name" placeholder="Product Name" />
+      <input type="text" id="price" placeholder="Php Price" />
+      <input type="text" id="image" placeholder="Image URL" />
+      <button onclick="addProduct()">Add</button>
+      <button onclick="closeAddModal()">Cancel</button>
+    </div>
+  </div>
+
+  <!-- Delete Product Modal -->
+  <div class="modal" id="deleteModal">
+    <div class="modal-content">
+      <h3>Delete Product</h3>
+      <select id="deleteIndex"></select>
+      <button onclick="deleteProduct()">Delete</button>
+      <button onclick="closeDeleteModal()">Cancel</button>
+    </div>
+  </div>
+
+  <script>
+    const productList = [
+      { type: 'NON VEGAN', name: 'HAM TOMATO', price: 'Php 499.00', image: 'https://static.vecteezy.com/system/resources/previews/030/660/317/large_2x/pizza-with-white-background-high-quality-ultra-hd-free-photo.jpg' },
+      { type: 'NON VEGAN', name: 'CHEESE LOADED', price: 'Php 399.00', image: 'https://static.vecteezy.com/system/resources/previews/030/660/301/non_2x/pizza-with-white-background-high-quality-ultra-hd-free-photo.jpg' },
+      { type: 'VEGAN', name: 'LEAF AND MUSHROOM', price: 'Php 479.00', image: 'https://thumbs.dreamstime.com/b/pizza-white-background-9753649.jpg' },
+      { type: 'BEVERAGE', name: 'ICED TEA', price: 'Php 110.00', image: 'https://static.vecteezy.com/system/resources/previews/030/212/482/large_2x/of-a-iced-tea-drink-isolated-on-white-background-generative-ai-photo.jpg' },
+      { type: 'NON VEGAN', name: 'SODA IN CAN', price: 'Php 59.00', image: 'https://png.pngtree.com/png-vector/20220615/ourmid/pngtree-colorful-soda-cans-on-white-background-red-drink-object-vector-png-image_46345914.jpg' },
+      { type: 'NON VEGAN', name: 'BEEF LOADED', price: 'Php 399.00', image: 'https://www.shutterstock.com/image-photo/pizza-cheese-isolated-on-white-600nw-1074752555.jpg' },
+      { type: 'VEGAN', name: 'GREEN GODDESS', price: 'Php 479.00', image: 'https://healthylivingjames.co.uk/wp-content/uploads/2023/08/Gluten-Free-Pizza-Square.jpg' },
+      { type: 'BEVERAGE', name: 'COKE ZERO', price: 'Php 110.00', image: 'https://l450v.alamy.com/450v/2h3ngf0/londonuk-october-21-2021-aluminium-can-of-coca-cola-zero-sugar-soda-drink-on-white-background-2h3ngf0.jpg' },
+      { type: 'NON VEGAN', name: 'HAM & MEAT', price: 'Php 499.00', image: 'https://images.freeimages.com/images/large-previews/388/pizza-on-white-background-1629658.jpg' },
+      { type: 'NON VEGAN', name: 'SAUSAGE OVERLOADED', price: 'Php 399.00', image: 'https://c8.alamy.com/comp/P23NB1/ham-and-sausage-pizza-on-white-background-copy-space-recipe-and-menu-top-view-P23NB1.jpg' },
+      { type: 'VEGAN', name: 'SPINACH PIZZA', price: 'Php 479.00', image: 'https://static.vecteezy.com/system/resources/previews/030/515/791/non_2x/pizza-with-bacon-and-spinach-on-white-background-photo.jpg' },
+      { type: 'BEVERAGE', name: 'COKE', price: 'Php 110.00', image: 'https://l450v.alamy.com/450v/2epjped/coca-cola-coke-glass-bottle-1-liter-isolated-on-white-background-2epjped.jpg' },
+      { type: 'VEGAN', name: 'GREENERY PIZZA', price: 'Php 399.00', image: 'https://static.vecteezy.com/system/resources/previews/030/515/791/non_2x/pizza-with-bacon-and-spinach-on-white-background-photo.jpg' },
+      { type: 'VEGAN', name: 'GREEN GODDESS', price: 'Php 479.00', image: 'https://thumbs.dreamstime.com/b/pizza-white-background-9753649.jpg' },
+      { type: 'BEVERAGE', name: 'FIZZ SODA', price: 'Php 110.00', image: 'https://i.pinimg.com/736x/91/57/68/915768b2965c6d3600a0c541a7b26699.jpg' },
+      { type: 'VEGAN', name: 'GREEN GODDESS', price: 'Php 479.00', image: 'https://thumbs.dreamstime.com/b/pizza-white-background-9753649.jpg' },
+      { type: 'BEVERAGE', name: 'ICED TEA', price: 'Php 110.00', image: 'https://static.vecteezy.com/system/resources/previews/030/212/482/large_2x/of-a-iced-tea-drink-isolated-on-white-background-generative-ai-photo.jpg' },
+      { type: 'NON VEGAN', name: 'CHEESY FEAST', price: 'Php 399.00', image: 'https://static.vecteezy.com/system/resources/previews/030/660/301/non_2x/pizza-with-white-background-high-quality-ultra-hd-free-photo.jpg' },
+      { type: 'VEGAN', name: 'VEGGIE GOOD', price: 'Php 479.00', image: 'https://thumbs.dreamstime.com/b/pizza-white-background-9753649.jpg' },
+      { type: 'BEVERAGE', name: 'ICED TEA', price: 'Php 110.00', image: 'https://static.vecteezy.com/system/resources/previews/030/212/482/large_2x/of-a-iced-tea-drink-isolated-on-white-background-generative-ai-photo.jpg' },
+    ];
+
+    const grid = document.getElementById('productGrid');
+    const deleteSelect = document.getElementById('deleteIndex');
+
+    function renderProducts() {
+      grid.innerHTML = '';
+      deleteSelect.innerHTML = '';
+      productList.forEach((product, index) => {
+        const card = document.createElement('div');
+        card.className = 'product-card';
+        card.innerHTML = `
+          <img src="${product.image}" alt="${product.name}" />
+          <div class="product-type">${product.type}</div>
+          <div class="product-name">${product.name}</div>
+          <div class="product-price">${product.price}</div>
+        `;
+        grid.appendChild(card);
+
+        const option = document.createElement('option');
+        option.value = index;
+        option.text = `${product.name} (${product.type})`;
+        deleteSelect.appendChild(option);
+      });
+    }
+
+    function openAddModal() {
+      document.getElementById('addModal').style.display = 'flex';
+    }
+
+    function closeAddModal() {
+      document.getElementById('addModal').style.display = 'none';
+    }
+
+    function openDeleteModal() {
+      document.getElementById('deleteModal').style.display = 'flex';
+    }
+
+    function closeDeleteModal() {
+      document.getElementById('deleteModal').style.display = 'none';
+    }
+
+    function addProduct() {
+      const type = document.getElementById('type').value;
+      const name = document.getElementById('name').value;
+      const price = document.getElementById('price').value;
+      const image = document.getElementById('image').value;
+      if (type && name && price && image) {
+        productList.push({ type, name, price, image });
+        renderProducts();
+        closeAddModal();
+      }
+    }
+
+    function deleteProduct() {
+      const index = deleteSelect.value;
+      if (index !== null) {
+        productList.splice(index, 1);
+        renderProducts();
+        closeDeleteModal();
+      }
+    }
+
+    // Navigation Functions
+    function logout() { window.location.href = "index.html"; }
+    function monitor() { window.location.href = "admin-dashb.html"; }
+    function goToProducts() { window.location.href = "admin-products.html"; }
+    function users() { window.location.href = "users.html"; }
+    function inventory() { window.location.href = "inventory.html"; }
+    function supply() { window.location.href = "supply.html"; }
+    function transact() { window.location.href = "transact.html"; }
+    function sales() { window.location.href = "sales.html"; }
+    function control() { window.location.href = "control.html"; }
+    function settings() { window.location.href = "settings.html"; }
+
+    // Allow modal close when clicking outside
+    window.onclick = function(event) {
+      const addModal = document.getElementById('addModal');
+      const deleteModal = document.getElementById('deleteModal');
+      if (event.target === addModal) closeAddModal();
+      if (event.target === deleteModal) closeDeleteModal();
+    }
+
+    // Render on page load
+    renderProducts();
+  </script>
+
+</body>
+</html>

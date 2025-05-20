@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Admin Dashboard</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: Arial, sans-serif; background-color: #fff; }
+    .container { display: flex; min-height: 100vh; }
+
+    .sidebar {
+      display: flex;
+      flex-direction: column;
+      width: 220px;
+      background-color: #328E6E;
+      padding: 20px;
+      color: #fff;
+      position: fixed;
+      top: 0;
+      left: 0;
+      bottom: 0;
+    }
+    .sidebar h2 { margin-bottom: 20px; }
+    .sidebar ul { list-style: none; }
+    .sidebar ul li {
+      cursor: pointer;
+      font-size: 18px;
+      padding: 10px;
+      border-radius: 5px;
+    }
+    .sidebar ul li:hover, .sidebar ul li.active {
+      background-color: #fff;
+      color: #328E6E;
+      font-weight: bold;
+    }
+    .logout-button {
+      margin-top: auto;
+      padding: 10px;
+      background-color: #4CAF50;
+      border: none;
+      color: #fff;
+      width: 100%;
+      text-align: center;
+      cursor: pointer;
+      border-radius: 5px;
+      transition: background-color 0.3s ease;
+    }
+    .logout-button:hover { background-color: darkgreen; }
+
+    .main {
+      margin-left: 220px;
+      padding: 30px;
+      flex: 1;
+    }
+
+    .settings-container {
+      background-color: white;
+      width: 100%;
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 30px;
+      border-radius: 10px;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    }
+
+    h2 {
+      color: #fff;
+    }
+
+    .section-title {
+      font-weight: bold;
+      margin-top: 20px;
+      margin-bottom: 10px;
+    }
+
+    .row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin: 10px 0;
+    }
+
+    label {
+      flex: 1;
+    }
+
+    select, .toggle {
+      padding: 10px;
+      font-size: 16px;
+      border-radius: 6px;
+      border: 1px solid #ccc;
+      flex: 1;
+      max-width: 200px;
+    }
+
+  .toggle {
+    appearance: none;
+    width: 42px;
+    height: 26px;
+    background: #ccc;
+    border-radius: 26px;
+    position: relative;
+    outline: none;
+    cursor: pointer;
+    transition: background 0.3s ease;
+    border: none;
+    flex: unset;         
+    max-width: unset;  
+  }
+
+
+    .toggle:checked {
+      background: #5DA364;
+    }
+
+  .toggle:before {
+    content: "";
+    position: absolute;
+    width: 22px;                /* knob width */
+    height: 22px;               /* knob height */
+    background: white;
+    border-radius: 50%;
+    top: 2px;                   /* ⬅ Adjust this to center vertically */
+    left: 2px;                  /* ⬅ initial position */
+    transition: left 0.3s ease;
+  }
+
+
+    .toggle:checked:before {
+    left: 18px; /* Adjust this depending on total toggle width */
+  }
+
+    .save-btn {
+      background-color: #5DA364;
+      color: white;
+      padding: 12px 24px;
+      font-size: 16px;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      margin-top: 20px;
+    }
+
+    .popup {
+      display: none;
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      background: #5DA364;
+      color: white;
+      padding: 15px 25px;
+      border-radius: 6px;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+      z-index: 9999;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="layout">
+    <div class="sidebar">
+      <h2>Dashboard</h2>
+      <ul>
+        <li class="monitor" onclick="monitor()">🏠 Monitoring</li>
+        <li class="users">👥 Users</li>
+        <li class="products" onclick="products()">🍕 Products</li>
+        <li class="inventory" onclick="inventory()">📦 Inventory</li>
+        <li class="supply" onclick="supply()">📋 Supply List</li>
+        <li class="transact" onclick="transact()">💳 Transactions</li>
+        <li class="sales" onclick="sales()">📈 Sales Report</li>
+        <li class="control" onclick="control()">🧭 Controlling</li>
+        <li class="active" onclick="settings()">⚙️ Settings</li>
+      </ul>
+      <button class="logout-button" onclick="logout()">↩️ Logout</button>
+    </div>
+
+    <div class="main">
+      <div class="settings-container">
+        <h2>System settings</h2>
+
+        <div class="section-title">General Preferences</div>
+        <div class="row">
+          <label for="language">Language</label>
+          <select id="language">
+            <option value="en">English</option>
+            <option value="es">Spanish</option>
+            <option value="tl">Tagalog</option>
+          </select>
+        </div>
+        <div class="row">
+          <label for="currency">Currency</label>
+          <select id="currency">
+            <option value="php">Pesos</option>
+            <option value="usd">USD</option>
+            <option value="eur">Euro</option>
+          </select>
+        </div>
+
+        <div class="row">
+          <label for="twoFactor">Two-Factor Authentication</label>
+          <input type="checkbox" class="toggle" id="twoFactor">
+        </div>
+        <div class="row">
+          <label for="manualBackup">Manual Backup</label>
+          <input type="checkbox" class="toggle" id="manualBackup">
+        </div>
+        <div class="row">
+          <label for="autoBackup">Automatic Backup</label>
+          <input type="checkbox" class="toggle" id="autoBackup" checked>
+        </div>
+
+        <div class="section-title">Login Notification Preferences</div>
+        <div class="row">
+          <label for="smsLogin">SMS login alerts</label>
+          <input type="checkbox" class="toggle" id="smsLogin" checked>
+        </div>
+        <div class="row">
+          <label for="emailLogin">Email login alerts</label>
+          <input type="checkbox" class="toggle" id="emailLogin">
+        </div>
+
+        <button class="save-btn" onclick="saveChanges()">Save Changes</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="popup" id="popup">All changes have been saved!</div>
+
+  <script>
+    function saveChanges() {
+      document.getElementById('popup').style.display = 'block';
+      setTimeout(() => {
+        document.getElementById('popup').style.display = 'none';
+      }, 3000);
+    }
+
+    function logout() {
+      window.location.href = "index.html";
+    }
+    function monitor() { window.location.href = "admin-dashb.html"; }
+    function products() { window.location.href = "admin-products.html"; }
+    function users() { window.location.href = "users.html"; }
+    function inventory() { window.location.href = "inventory.html"; }
+    function supply() { window.location.href = "supply.html"; }
+    function transact() { window.location.href = "transact.html"; }
+    function sales() { window.location.href = "sales.html"; }
+    function control() { window.location.href = "control.html"; }
+    function settings() { window.location.href = "settings.html"; }
+  </script>
+
+</body>
+</html>

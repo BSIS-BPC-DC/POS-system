@@ -1,0 +1,376 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Ninja Pizza Staff Dashboard</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: Arial, sans-serif; background-color: #fff; }
+
+    .wrapper {
+      display: flex;
+      min-height: 100vh;
+    }
+
+    .sidebar {
+      display: flex;
+      flex-direction: column;
+      width: 220px;
+      background-color: #328E6E;
+      padding: 20px;
+      color: #fff;
+      position: fixed;
+      top: 0;
+      left: 0;
+      bottom: 0;
+    }
+
+    .sidebar h2 { margin-bottom: 20px; }
+    .sidebar ul { list-style: none; }
+    .sidebar ul li {
+      cursor: pointer;
+      font-size: 18px;
+      padding: 10px;
+      border-radius: 5px;
+    }
+    .sidebar ul li:hover,
+    .sidebar ul li.active {
+      background-color: #fff;
+      color: #328E6E;
+      font-weight: bold;
+    }
+
+    .logout-button {
+      margin-top: auto;
+      padding: 10px;
+      background-color: #4CAF50;
+      border: none;
+      color: #fff;
+      width: 100%;
+      text-align: center;
+      cursor: pointer;
+      border-radius: 5px;
+      transition: background-color 0.3s ease;
+    }
+
+    .logout-button:hover { background-color: darkgreen; }
+
+    .main-content {
+      margin-left: 220px;
+      padding: 40px;
+      flex-grow: 1;
+      background-color: transparent;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+    .header {
+      margin-bottom: 20px;
+    }
+    .header h1 {
+      font-size: 24px;
+      margin-bottom: 10px;
+      color: #328E6E;
+    }
+    .header .datetime {
+      color: #777;
+      font-size: 14px;
+    }
+    .order-items, .order-summary {
+      background-color: #fff;
+      padding: 20px;
+      margin-bottom: 20px;
+      border-radius: 8px;
+      box-shadow: 0px 2px 5px rgba(0,0,0,0.1);
+    }
+    .order-items h2 {
+      font-size: 20px;
+      margin-bottom: 15px;
+      color: #333;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-bottom: 15px;
+    }
+    table th, table td {
+      padding: 10px;
+      text-align: left;
+      border-bottom: 1px solid #ddd;
+    }
+    .order-summary p {
+      font-size: 16px;
+      margin: 5px 0;
+      color: #333;
+    }
+    .order-summary .amount {
+      font-weight: bold;
+      color: #27ae60;
+    }
+    .keypad {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+      margin-bottom: 20px;
+    }
+    .keypad button {
+      padding: 20px;
+      font-size: 18px;
+      background-color: #ecf0f1;
+      border: 1px solid #bdc3c7;
+      border-radius: 5px;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
+    .keypad button:hover {
+      background-color: #bdc3c7;
+    }
+    .control-buttons {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+    .control-buttons button {
+      flex: 1;
+      padding: 15px;
+      font-size: 16px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+      color: #fff;
+    }
+    .payment { background-color: #27ae60; }
+    .refund { background-color: #e67e22; }
+    .endsession { background-color: #e74c3c; }
+    .print { background-color: #2980b9; }
+    .control-buttons button:hover {
+      opacity: 0.8;
+    }
+
+    .button {
+      background-color: #f4f4f4;
+      padding: 15px 25px;
+      border-radius: 10px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-weight: bold;
+      color: #2c7a60;
+      font-size: 26px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+      cursor: pointer;
+    }
+
+    /* Modal styles */
+    #paymentModal {
+      display: none;
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(0, 0, 0, 0.5);
+      justify-content: center;
+      align-items: center;
+      z-index: 1000;
+    }
+    #paymentModal .modal-content {
+      background: #fff;
+      padding: 20px;
+      border-radius: 8px;
+      width: 300px;
+      text-align: center;
+      position: relative;
+    }
+    #paymentModal input {
+      width: 100%;
+      padding: 5px;
+      margin-bottom: 10px;
+    }
+    .buttonclose{
+      position:absolute;
+      top:10px;
+      right:10px;
+      color: red;
+    }
+    .processcard{
+      width:100%; 
+      padding:10px; 
+      margin-top:10px;
+      background-color: green;
+      color: white;
+      font-weight: bold;
+    }
+    #cardForm{
+      display:none; 
+      margin-top:15px; 
+      text-align:left;
+    }
+    #cashb{
+      background-color: green;
+      color: whitesmoke;
+      font-weight: bold;
+    }
+    #creditb{
+      background-color: blue;
+      color: whitesmoke;
+      font-weight: bold;
+
+    }
+
+  </style>
+</head>
+<body>
+
+  <!-- Sidebar -->
+  <div class="sidebar">
+    <h2>Dashboard</h2>
+    <ul>
+      <li class="active" onclick="dashb()">🍕 Products</li>
+      <li class="inventory" onclick="inventory()">📦 Inventory</li>
+    </ul>
+    <button class="logout-button" onclick="logout()">↩️ Logout</button>
+  </div>
+
+  <!-- Main Content -->
+  <div class="main-content">
+    <div class="header">
+      <h1>Hello, Staff! Welcome back to your dashboard</h1>
+      <div class="datetime" id="datetime"></div>
+    </div>
+
+    <div class="button" id="allUsersBtn">
+      <span onclick="products()"> 🍕 PRODUCTS</span>
+      <span class="arrow" onclick="products()">➡️</span>
+    </div>
+
+    <div class="order-items">
+      <h2>Order Items</h2>
+      <table>
+        <thead>
+          <tr><th>Item</th><th>Qty</th><th>Price</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>CHEEZE DELUXE</td><td>1</td><td>PHP 499.00</td></tr>
+          <tr><td>SOFT DRINKS</td><td>1</td><td>PHP 100.00</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="order-summary">
+      <p>SUB TOTAL: <span class="amount">PHP 599.00</span></p>
+      <p>DISCOUNT (5%): <span class="amount">PHP -29.95</span></p>
+      <p>TAX (12%): <span class="amount">PHP 71.88</span></p>
+      <p><strong>TOTAL AMOUNT: <span class="amount">PHP 640.93</span></strong></p>
+    </div>
+
+    <div class="keypad">
+      <button>1</button><button>2</button><button>3</button>
+      <button>4</button><button>5</button><button>6</button>
+      <button>7</button><button>8</button><button>9</button>
+      <button>0</button><button>C</button><button>&larr;</button>
+    </div>
+
+    <div class="control-buttons">
+      <button class="payment" onclick="payNow()">PAYMENT</button>
+      <button class="refund">REFUND</button>
+      <button class="endsession">END SESSION</button>
+      <button class="print" onclick="printPage()">PRINT</button>
+    </div>
+  </div>
+
+  <!-- Payment Modal -->
+  <div id="paymentModal">
+    <div class="modal-content">
+      <h2>Select Payment Method</h2>
+      <button onclick="payWithCash()" id="cashb">Cash</button>
+      <button onclick="showCardForm()" id="creditb">Credit Card</button>
+      <button onclick="closeModal()" class="buttonclose">✖</button>
+      
+      <div id="cardForm">
+        <label>Card Number:</label><br>
+        <input type="text" id="cardNumber"><br>
+        <label>CVV:</label><br>
+        <input type="text" id="cvv"><br>
+        <label>Cardholder Name:</label><br>
+        <input type="text" id="cardName"><br>
+        <button onclick="processCardPayment()" class="processcard">Submit Payment</button>
+      </div>
+    </div>
+  </div>
+
+
+  <script>
+    const totalAmount = 640.93;
+
+    function updateDateTime() {
+      const now = new Date();
+      const optionsDate = { year: 'numeric', month: 'short', day: 'numeric' };
+      const optionsTime = { hour: 'numeric', minute: 'numeric', hour12: true };
+      const formattedDate = now.toLocaleDateString('en-US', optionsDate);
+      const formattedTime = now.toLocaleTimeString('en-US', optionsTime);
+      document.getElementById('datetime').textContent = formattedDate + ' - ' + formattedTime;
+    }
+    updateDateTime();
+
+    function printPage() {
+      window.print();
+    }
+
+    function logout() {
+      window.location.href = "./../index.html";
+    }
+
+    function dashb() {
+      window.location.href = "staff-dashb.html";
+    }
+
+    function products() {
+      window.location.href = "staff-products.html";
+    }
+
+    function inventory() {
+      window.location.href = "staff-inventory.html";
+    }
+
+    function payNow() {
+      document.getElementById('paymentModal').style.display = 'flex';
+    }
+
+    function closeModal() {
+      document.getElementById('paymentModal').style.display = 'none';
+      document.getElementById('cardForm').style.display = 'none';
+    }
+
+    function payWithCash() {
+      alert(`Payment of PHP ${totalAmount.toFixed(2)} received in cash.\nPrinting Receipt...`);
+      printPage();
+      closeModal();
+    }
+
+    function showCardForm() {
+      document.getElementById('cardForm').style.display = 'block';
+    }
+
+    function processCardPayment() {
+      const cardNumber = document.getElementById('cardNumber').value;
+      const cvv = document.getElementById('cvv').value;
+      const cardName = document.getElementById('cardName').value;
+
+      if (!cardNumber || !cvv || !cardName) {
+        alert("Please fill in all credit card fields.");
+        return;
+      }
+
+      if (cardNumber.length < 12 || cvv.length < 3) {
+        alert("Invalid card details.");
+        return;
+      }
+
+      alert(`Payment of PHP ${totalAmount.toFixed(2)} received via Credit Card.\nPrinting Receipt...`);
+      printPage();
+      closeModal();
+    }
+  </script>
+
+</body>
+</html>

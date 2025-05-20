@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Admin Dashboard</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: Arial, sans-serif; background-color: #fff; }
+    .container { display: flex; min-height: 100vh; }
+
+    .sidebar {
+      display: flex;
+      flex-direction: column;
+      width: 220px;
+      background-color: #328E6E;
+      padding: 20px;
+      color: #fff;
+      position: fixed;
+      top: 0;
+      left: 0;
+      bottom: 0;
+    }
+    .sidebar h2 { margin-bottom: 20px; }
+    .sidebar ul { list-style: none; }
+    .sidebar ul li {
+      cursor: pointer;
+      font-size: 18px;
+      padding: 10px;
+      border-radius: 5px;
+    }
+    .sidebar ul li:hover, .sidebar ul li.active {
+      background-color: #fff;
+      color: #328E6E;
+      font-weight: bold;
+    }
+    .logout-button {
+      margin-top: auto;
+      padding: 10px;
+      background-color: #4CAF50;
+      border: none;
+      color: #fff;
+      width: 100%;
+      text-align: center;
+      cursor: pointer;
+      border-radius: 5px;
+      transition: background-color 0.3s ease;
+    }
+    .logout-button:hover { background-color: darkgreen; }
+    .main-content {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+    }
+
+    .main-content {
+      width: 80%;
+      margin-left: 200px;
+      padding: 20px;
+    }
+    .filter-bar {
+      display: flex;
+      justify-content: center;
+      margin-bottom: 20px;
+    }
+    .filter-bar input {
+      width: 250px;
+      padding: 10px;
+      border-radius: 20px;
+      border: 1px solid #ccc;
+      margin-right: 10px;
+    }
+    .filter-bar button {
+      background-color: #888;
+      color: white;
+      border: none;
+      border-radius: 10px;
+      padding: 10px 20px;
+      cursor: pointer;
+    }
+    .table-container {
+      background: #fff;
+      padding: 20px;
+      border-radius: 10px;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 16px;
+    }
+    th, td {
+      padding: 15px;
+      text-align: left;
+      border-bottom: 1px solid #ccc;
+    }
+
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <!-- Sidebar -->
+    <div class="sidebar">
+      <h2>Dashboard</h2>
+    <ul>
+      <li class="monitor" onclick="monitor()">🏠 Monitoring</li>
+      <li class="users">👥 Users</li>
+      <li class="products" onclick="products()">🍕 Products</li>
+      <li class="inventory" onclick="inventory()">📦 Inventory</li>
+      <li class="supply" onclick="supply()">📋 Supply List</li>
+      <li class="active" onclick="transact()">💳 Transactions</li>
+      <li class="sales" onclick="sales()">📈 Sales Report</li>
+      <li class="control" onclick="control()">🧭 Controlling</li>
+      <li class="settings" onclick="settings()">⚙️ Settings</li>
+    </ul>
+    <button class="logout-button" onclick="logout()">↩️ Logout</button>
+    </div>
+
+<!-- Main -->
+  <div class="main-content">
+    <div class="filter-bar">
+      <input type="text" id="searchInput" placeholder="Enter a word to filter">
+      <button onclick="filterTable()">Filter</button>
+    </div>
+
+    <div class="table-container">
+      <table id="transactionTable">
+        <thead>
+          <tr>
+            <th>Date</th>
+            <th>I.D.</th>
+            <th>Amount</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>2025-05-15</td>
+            <td>TXN001</td>
+            <td>$100</td>
+          </tr>
+          <tr>
+            <td>2025-05-14</td>
+            <td>TXN002</td>
+            <td>$250</td>
+          </tr>
+          <tr>
+            <td>2025-05-13</td>
+            <td>TXN003</td>
+            <td>$75</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+
+  <script>
+
+    function filterTable() {
+      const input = document.getElementById("searchInput").value.toLowerCase();
+      const table = document.getElementById("transactionTable");
+      const rows = table.getElementsByTagName("tr");
+
+      for (let i = 1; i < rows.length; i++) {
+        const rowText = rows[i].innerText.toLowerCase();
+        rows[i].style.display = rowText.includes(input) ? "" : "none";
+      }
+    }
+
+
+    function logout() {
+      window.location.href = "index.html";
+    }
+
+
+    function monitor() {
+      window.location.href = "admin-dashb.html";
+    }
+
+    function products() {
+      window.location.href = "admin-products.html";
+    }
+
+    function users() {
+      window.location.href = "users.html";
+    }
+    function inventory() {
+      window.location.href = "inventory.html";
+    }
+
+
+    function supply() {
+      window.location.href = "supply.html";
+    }
+    function transact() {
+      window.location.href = "transact.html";
+    }
+    function sales() {
+      window.location.href = "sales.html";
+    }
+    function control() {
+      window.location.href = "control.html";
+    }
+    function settings() {
+      window.location.href = "settings.html";
+    }
+
+
+  </script>
+
+</body>
+</html>

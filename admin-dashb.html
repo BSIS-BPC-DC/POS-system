@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Admin Dashboard</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #E1EEBC;
+    }
+
+    .sidebar {
+      display: flex;
+      flex-direction: column;
+      width: 220px;
+      height: 100vh;
+      background-color: #328E6E;
+      padding: 20px;
+      color: #fff;
+      position: fixed;
+      top: 0;
+      left: 0;
+    }
+
+    .sidebar h2 {
+      margin-bottom: 20px;
+    }
+
+    .sidebar ul {
+      list-style: none;
+    }
+
+    .sidebar ul li {
+      text-decoration: none;
+      color: #fff;
+      font-size: 18px;
+      display: block;
+      padding: 10px;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+
+    .sidebar ul li:hover, .sidebar ul li.active {
+      background-color: #fff;
+      color: #328E6E;
+      font-weight: bold;
+    }
+
+    .logout-button {
+      margin-top: auto;
+      padding: 10px;
+      background-color: #4CAF50;
+      border: none;
+      color: #fff;
+      width: 100%;
+      text-align: center;
+      cursor: pointer;
+      border-radius: 5px;
+      transition: background-color 0.3s ease;
+    }
+
+    .logout-button:hover {
+      background-color: darkgreen;
+    }
+
+    .main-content {
+      margin-left: 240px;
+      padding: 20px;
+    }
+
+    .header {
+      margin-bottom: 20px;
+    }
+
+    .header h1 {
+      color: #328E6E;
+      margin-bottom: 10px;
+    }
+
+    .header .datetime {
+      color: #9E9E9E;
+      font-size: 14px;
+    }
+
+    .info-boxes {
+      display: flex;
+      gap: 20px;
+      margin: 20px;
+      margin-top: 50px;
+      flex-wrap: wrap;
+    }
+
+    .info-box {
+      background-color: #fff;
+      padding: 20px;
+      border-radius: 10px;
+      flex: 1;
+      min-width: 250px;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    }
+
+    .info-box h3 {
+      margin-bottom: 10px;
+      color: #4A4A4A;
+    }
+
+    .info-box p {
+      font-size: 16px;
+      color: #4CAF50;
+    }
+
+    .info-box ul {
+      margin-top: 10px;
+      list-style: disc;
+      padding-left: 20px;
+      color: #555;
+    }
+
+    .info-box ul li {
+      margin-bottom: 5px;
+      font-size: 14px;
+    }
+
+    .sales-graph {
+      margin-bottom: 20px;
+      padding: 20px;
+      background-color: #fff;
+      border-radius: 10px;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    }
+
+    .sales-graph h3 {
+      margin-bottom: 15px;
+      color: #4A4A4A;
+    }
+
+    .graph-bars {
+      display: flex;
+      align-items: flex-end;
+      justify-content: space-around;
+      height: 200px;
+    }
+
+    .bar {
+      width: 30px;
+      background-color: #8BC34A;
+      border-radius: 5px 5px 0 0;
+    }
+
+    .bar1 { height: 80px; }
+    .bar2 { height: 120px; }
+    .bar3 { height: 100px; }
+
+    .dashboard-cards {
+      display: flex;
+      gap: 20px;
+      flex-wrap: wrap;
+    }
+
+    .card {
+      background-color: #fff;
+      border-radius: 10px;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+      padding: 20px;
+      flex: 1;
+      min-width: 200px;
+      text-align: center;
+    }
+
+    .card h3 {
+      margin-bottom: 10px;
+      color: #4A4A4A;
+    }
+
+    .card p {
+      font-size: 18px;
+      color: #4CAF50;
+    }
+  </style>
+</head>
+<body>
+  <!-- Sidebar -->
+  <div class="sidebar">
+    <h2>Dashboard</h2>
+    <ul>
+      <li class="active">🏠 Monitoring</li>
+      <li class="users" onclick="users()">👥 Users</li>
+      <li class="products" onclick="products()">🍕 Products</li>
+      <li class="inventory" onclick="inventory()">📦 Inventory</li>
+      <li class="supply" onclick="supply()">📋 Supply List</li>
+      <li class="transact" onclick="transact()">💳 Transactions</li>
+      <li class="sales" onclick="sales()">📈 Sales Report</li>
+      <li class="control" onclick="control()">🧭 Controlling</li>
+      <li class="settings" onclick="settings()">⚙️ Settings</li>
+    </ul>
+    <button class="logout-button" onclick="logout()">↩️ Logout</button>
+  </div>
+
+  <!-- Main Content -->
+  <div class="main-content">
+    <div class="header">
+      <h1>Hello, Admin! Welcome back to your dashboard</h1>
+      <div class="datetime" id="datetime"></div>
+    </div>
+
+    <div class="info-boxes">
+      <div class="info-box" onclick="low()"><h3>Low Stock Items</h3><p>1 low stock</p></div>
+      <div class="info-box" onclick="notif()"><h3>Notifications</h3><p>1 Supplier</p></div>
+      <div class="info-box"><h3>Active Users</h3><p>User number one, <br>User number six, <br>User number ten</p></div>
+    </div>
+
+    <div class="sales-graph">
+      <h3>Sales Graph</h3>
+      <div class="graph-bars">
+        <div class="bar bar1"></div>
+        <div class="bar bar2"></div>
+        <div class="bar bar3"></div>
+      </div>
+    </div>
+
+    <div class="dashboard-cards">
+      <div class="card"><h3>Current Sales</h3><p>Php 26,900</p></div>
+      <div class="card"><h3>Current Orders</h3><p>17</p></div>
+      <div class="card"><h3>Discrepancies</h3><p>Php 0.00</p></div>
+      <div class="card"><h3>Monthly Revenue</h3><p>Php 80,963.00</p></div>
+    </div>
+
+    <!-- New Section Below Dashboard Cards -->
+    <div class="info-boxes">
+      <div class="info-box">
+        <h3>Top Selling Products</h3>
+        <ul>
+          <li>Cheese Pizza – 120 orders</li>
+          <li>Pepperoni Pizza – 95 orders</li>
+          <li>Garlic Bread – 70 orders</li>
+        </ul>
+      </div>
+      <div class="info-box">
+        <h3>Recent Activity</h3>
+        <ul>
+          <li>Order #1023 placed</li>
+          <li>New product added: Veggie Pizza</li>
+          <li>Inventory updated by Admin</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    function updateDateTime() {
+      const now = new Date();
+      const optionsDate = { year: 'numeric', month: 'short', day: 'numeric' };
+      const optionsTime = { hour: '2-digit', minute: '2-digit' };
+      const formattedDate = now.toLocaleDateString('en-US', optionsDate);
+      const formattedTime = now.toLocaleTimeString('en-US', optionsTime);
+      document.getElementById('datetime').textContent = formattedDate + ' - ' + formattedTime;
+    }
+
+    function logout() {
+      window.location.href = "index.html";
+    }
+
+    function users() {
+      window.location.href = "users.html";
+    }
+
+    function products() {
+      window.location.href = "admin-products.html";
+    }
+
+    function inventory() {
+      window.location.href = "inventory.html";
+    }
+
+    function supply() {
+      window.location.href = "supply.html";
+    }
+
+    function transact() {
+      window.location.href = "transact.html";
+    }
+
+    function sales() {
+      window.location.href = "sales.html";
+    }
+
+    function control() {
+      window.location.href = "control.html";
+    }
+
+    function settings() {
+      window.location.href = "settings.html";
+    }
+
+    function low() {
+      window.location.href = "inventory.html";
+    }
+
+    function notif() {
+      window.location.href = "supply.html";
+    }
+
+    updateDateTime();
+    setInterval(updateDateTime, 60000);
+  </script>
+</body>
+</html>

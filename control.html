@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Admin Dashboard</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: Arial, sans-serif; background-color: #fff; }
+
+    .container {
+      display: flex;
+    }
+
+    .sidebar {
+      display: flex;
+      flex-direction: column;
+      width: 220px;
+      background-color: #328E6E;
+      padding: 20px;
+      color: #fff;
+      position: fixed;
+      top: 0;
+      left: 0;
+      bottom: 0;
+    }
+
+    .sidebar h2 { margin-bottom: 20px; }
+
+    .sidebar ul { list-style: none; }
+
+    .sidebar ul li {
+      cursor: pointer;
+      font-size: 18px;
+      padding: 10px;
+      border-radius: 5px;
+    }
+
+    .sidebar ul li:hover,
+    .sidebar ul li.active {
+      background-color: #fff;
+      color: #328E6E;
+      font-weight: bold;
+    }
+
+    .logout-button {
+      margin-top: auto;
+      padding: 10px;
+      background-color: #4CAF50;
+      border: none;
+      color: #fff;
+      width: 100%;
+      text-align: center;
+      cursor: pointer;
+      border-radius: 5px;
+      transition: background-color 0.3s ease;
+    }
+
+    .logout-button:hover {
+      background-color: darkgreen;
+    }
+
+    .main-content {
+      margin-left: 220px; /* match sidebar width */
+      width: calc(100% - 220px);
+      padding: 40px;
+    }
+
+    .dashboard {
+      width: 100%;
+      background: white;
+      padding: 20px;
+      border-radius: 12px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    }
+
+    h2 {
+      color: #fff;
+      margin-bottom: 20px;
+    }
+
+    .row {
+      margin-bottom: 15px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+    }
+
+    .row input[type="text"],
+    .row input[type="time"] {
+      padding: 6px 10px;
+      border-radius: 6px;
+      border: 1px solid #ccc;
+    }
+
+    .switch {
+      position: relative;
+      display: inline-block;
+      width: 40px;
+      height: 20px;
+    }
+
+    .switch input {
+      opacity: 0;
+      width: 0;
+      height: 0;
+    }
+
+    .slider {
+      position: absolute;
+      cursor: pointer;
+      top: 0; left: 0;
+      right: 0; bottom: 0;
+      background-color: #ccc;
+      transition: .4s;
+      border-radius: 20px;
+    }
+
+    .slider:before {
+      position: absolute;
+      content: "";
+      height: 14px;
+      width: 14px;
+      left: 3px;
+      bottom: 3px;
+      background-color: white;
+      transition: .4s;
+      border-radius: 50%;
+    }
+
+    input:checked + .slider {
+      background-color: #4CAF50;
+    }
+
+    input:checked + .slider:before {
+      transform: translateX(20px);
+    }
+
+    button {
+      padding: 6px 16px;
+      border: none;
+      border-radius: 6px;
+      background: #4CAF50;
+      color: white;
+      cursor: pointer;
+    }
+
+    .go-button {
+      background: #FF5722;
+    }
+
+    .view-button {
+      background: #C8E6C9;
+      color: #333;
+    }
+
+    .popup {
+      position: fixed;
+      top: 40%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background: white;
+      padding: 20px 30px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+      border-radius: 12px;
+      z-index: 1000;
+      display: none;
+    }
+
+    .popup h3 {
+      margin-top: 0;
+    }
+
+    .overlay {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background: rgba(0,0,0,0.3);
+      display: none;
+      z-index: 999;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <!-- Sidebar -->
+    <div class="sidebar">
+      <h2>Dashboard</h2>
+      <ul>
+        <li class="monitor" onclick="monitor()">🏠 Monitoring</li>
+        <li class="users" onclick="users()">👥 Users</li>
+        <li class="products" onclick="products()">🍕 Products</li>
+        <li class="inventory" onclick="inventory()">📦 Inventory</li>
+        <li class="supply" onclick="supply()">📋 Supply List</li>
+        <li class="transact" onclick="transact()">💳 Transactions</li>
+        <li class="sales" onclick="sales()">📈 Sales Report</li>
+        <li class="active" onclick="control()">🧭 Controlling</li>
+        <li class="settings" onclick="settings()">⚙️ Settings</li>
+      </ul>
+      <button class="logout-button" onclick="logout()">↩️ Logout</button>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content">
+      <div class="dashboard">
+        <h2>Controls</h2>
+
+        <div class="row">
+          <label>Maintenance Mode</label>
+          <label class="switch">
+            <input type="checkbox" id="maintenanceToggle">
+            <span class="slider"></span>
+          </label>
+        </div>
+
+        <div class="row">
+          <label>Force logout a user</label>
+          <input type="text" placeholder="Enter username" id="logoutUser">
+          <button class="go-button" onclick="logoutUser()">Go</button>
+        </div>
+
+        <div class="row">
+          <label>Restrict login hours</label>
+          <input type="time" id="startTime" value="08:00">
+          <span>to</span>
+          <input type="time" id="endTime" value="22:00">
+        </div>
+
+        <h3>License Management</h3>
+
+        <div class="row">
+          <label>View license key</label>
+          <button class="view-button" onclick="showPopup('License Key', 'SAMPLE-KEY-1234-5678')">View</button>
+        </div>
+
+        <div class="row">
+          <label>See system version</label>
+          <button class="view-button" onclick="showPopup('System Version', 'v1.0.5 Stable')">View</button>
+        </div>
+
+        <div class="row">
+          <label>Update system</label>
+          <button class="view-button" onclick="showPopup('System Update', 'The system is up-to-date!')">Go</button>
+        </div>
+
+        <div class="row" style="justify-content: flex-end;">
+          <button onclick="saveChanges()">Save Changes</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Overlay & Popup -->
+  <div class="overlay" id="overlay" onclick="closePopup()"></div>
+  <div class="popup" id="popup">
+    <h3 id="popupTitle"></h3>
+    <p id="popupMessage"></p>
+    <button onclick="closePopup()">Close</button>
+  </div>
+
+  <!-- JavaScript -->
+  <script>
+    function logoutUser() {
+      const user = document.getElementById('logoutUser').value;
+      if (user) {
+        showPopup("Force Logout", `User '${user}' has been logged out.`);
+        document.getElementById('logoutUser').value = "";
+      }
+    }
+
+    function saveChanges() {
+      showPopup("Success", "All changes have been saved!");
+    }
+
+    function showPopup(title, message) {
+      document.getElementById('popupTitle').innerText = title;
+      document.getElementById('popupMessage').innerText = message;
+      document.getElementById('overlay').style.display = "block";
+      document.getElementById('popup').style.display = "block";
+    }
+
+    function closePopup() {
+      document.getElementById('overlay').style.display = "none";
+      document.getElementById('popup').style.display = "none";
+    }
+
+    function logout() {
+      window.location.href = "index.html";
+    }
+
+    function monitor() {
+      window.location.href = "admin-dashb.html";
+    }
+
+    function users() {
+      window.location.href = "users.html";
+    }
+
+    function products() {
+      window.location.href = "admin-products.html";
+    }
+
+    function inventory() {
+      window.location.href = "inventory.html";
+    }
+
+    function supply() {
+      window.location.href = "supply.html";
+    }
+
+    function transact() {
+      window.location.href = "transact.html";
+    }
+
+    function sales() {
+      window.location.href = "sales.html";
+    }
+
+    function control() {
+      window.location.href = "control.html";
+    }
+
+    function settings() {
+      window.location.href = "settings.html";
+    }
+  </script>
+
+</body>
+</html>

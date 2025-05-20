@@ -1,0 +1,364 @@
+=<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Admin Inventory</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: Arial, sans-serif; background-color: #fff; }
+    .container { display: flex; min-height: 100vh; }
+
+    .sidebar {
+      display: flex;
+      flex-direction: column;
+      width: 220px;
+      background-color: #328E6E;
+      padding: 20px;
+      color: #fff;
+      position: fixed;
+      top: 0;
+      left: 0;
+      bottom: 0;
+    }
+    .sidebar h2 { margin-bottom: 20px; }
+    .sidebar ul { list-style: none; }
+    .sidebar ul li {
+      cursor: pointer;
+      font-size: 18px;
+      padding: 10px;
+      border-radius: 5px;
+    }
+    .sidebar ul li:hover, .sidebar ul li.active {
+      background-color: #fff;
+      color: #328E6E;
+      font-weight: bold;
+    }
+    .logout-button {
+      margin-top: auto;
+      padding: 10px;
+      background-color: #4CAF50;
+      border: none;
+      color: #fff;
+      width: 100%;
+      text-align: center;
+      cursor: pointer;
+      border-radius: 5px;
+      transition: background-color 0.3s ease;
+    }
+    .logout-button:hover { background-color: darkgreen; }
+
+    .main-content {
+      margin-left: 220px;
+      padding: 40px;
+      flex-grow: 1;
+      background-color: transparent;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    .menu-button {
+      background-color: #f9f9f9;
+      border-radius: 10px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 20px;
+      margin-bottom: 20px;
+      width: 90%;
+      height: 10%;
+      cursor: pointer;
+    }
+
+    .menu-button .icon-label {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-weight: bold;
+      font-size: 16px;
+      color: #72b26d;
+    }
+
+    .menu-button img {
+      width: 20px;
+      height: 20px;
+    }
+
+    .menu-button .arrow {
+      color: #8ac28a;
+      font-size: 20px;
+    }
+
+    .low-stock .icon-label {
+      color: #d7a030;
+    }
+
+    .delete-stock .icon-label {
+      color: #d15252;
+    }
+
+    /* Modal styles */
+    .modal {
+      display: none;
+      position: fixed;
+      z-index: 999;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      overflow: auto;
+      background-color: rgba(0,0,0,0.5);
+      justify-content: center;
+      align-items: center;
+    }
+
+    .modal-content {
+      background-color: #fff;
+      padding: 30px;
+      border-radius: 10px;
+      width: 400px;
+      position: relative;
+    }
+
+    .close {
+      position: absolute;
+      top: 10px;
+      right: 15px;
+      font-size: 24px;
+      cursor: pointer;
+      color: #333;
+    }
+
+    .modal-content h3 {
+      margin-bottom: 15px;
+    }
+
+    .modal-content input {
+      width: 100%;
+      padding: 10px;
+      margin-bottom: 15px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+    }
+
+    .modal-content button {
+      background-color: #328E6E;
+      color: white;
+      padding: 10px 20px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+
+    .modal-content button:hover {
+      background-color: #276b55;
+    }
+
+
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <!-- Sidebar -->
+    <div class="sidebar">
+      <h2>Dashboard</h2>
+      <ul>
+        <li class="monitor" onclick="monitor()">🏠 Monitoring</li>
+        <li class="users" onclick="users()">👥 Users</li>
+        <li class="products" onclick="products()">🍕 Products</li>
+        <li class="active" onclick="inventory()">📦 Inventory</li>
+        <li class="supply" onclick="supply()">📋 Supply List</li>
+        <li class="transact" onclick="transact()">💳 Transactions</li>
+        <li class="sales" onclick="sales()">📈 Sales Report</li>
+        <li class="control" onclick="control()">🧭 Controlling</li>
+        <li class="settings" onclick="settings()">⚙️ Settings</li>
+      </ul>
+      <button class="logout-button" onclick="logout()">↩️ Logout</button>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content">
+      <div class="menu-button" onclick="openModal('stockListModal')">
+        <div class="icon-label">
+          <img src="https://img.icons8.com/ios-filled/50/72b26d/list.png"/>
+          Stock List
+        </div>
+        <div class="arrow">➡️</div>
+      </div>
+      <div class="menu-button low-stock" onclick="openModal('lowStockModal')">
+        <div class="icon-label">
+          <img src="https://img.icons8.com/ios-filled/50/d7a030/error.png"/>
+          Low Stock Alert
+        </div>
+        <div class="arrow">➡️</div>
+      </div>
+      <div class="menu-button" onclick="openModal('addStockModal')">
+        <div class="icon-label">
+          <img src="https://img.icons8.com/ios-filled/50/72b26d/add-database.png"/>
+          Add New Stock
+        </div>
+        <div class="arrow">➡️</div>
+      </div>
+      <div class="menu-button delete-stock" onclick="openModal('deleteStockModal')">
+        <div class="icon-label">
+          <img src="https://img.icons8.com/ios-filled/50/d15252/delete-database.png"/>
+          Delete Stock
+        </div>
+        <div class="arrow">➡️</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Add New Stock Modal -->
+  <div id="addStockModal" class="modal">
+    <div class="modal-content">
+      <span class="close" onclick="closeModal('addStockModal')">&times;</span>
+      <h3>Add New Stock</h3>
+      <input type="text" placeholder="Item Name" />
+      <input type="number" placeholder="Quantity" />
+      <input type="text" placeholder="Category" />
+      <button onclick="submitStock()">Submit</button>
+    </div>
+  </div>
+
+  <!-- Stock List Modal -->
+  <div id="stockListModal" class="modal">
+    <div class="modal-content" style="max-height: 80vh; overflow-y: auto;">
+      <span class="close" onclick="closeModal('stockListModal')">&times;</span>
+      <h3>Stock List</h3>
+      <div id="stock-list-container" style="display: flex; flex-direction: column; gap: 15px;"></div>
+    </div>
+  </div>
+
+  <!-- Low Stock Alert Modal -->
+  <div id="lowStockModal" class="modal">
+    <div class="modal-content" style="max-height: 70vh; overflow-y: auto;">
+      <span class="close" onclick="closeModal('lowStockModal')">&times;</span>
+      <h3>Low Stock Alert</h3>
+      <div id="low-stock-container" style="display: flex; flex-direction: column; gap: 15px;"></div>
+    </div>
+  </div>
+
+  <!-- Delete Stock Modal -->
+  <div id="deleteStockModal" class="modal">
+    <div class="modal-content">
+      <span class="close" onclick="closeModal('deleteStockModal')">&times;</span>
+      <h3>Delete Stock</h3>
+      <input type="text" placeholder="Enter Item ID or Name" />
+      <button onclick="deleteStock()">Delete</button>
+    </div>
+  </div>
+
+  <script>
+    function logout() { window.location.href = "index.html"; }
+    function monitor() { window.location.href = "admin-dashb.html"; }
+    function users() { window.location.href = "users.html"; }
+    function products() { window.location.href = "admin-products.html"; }
+    function supply() { window.location.href = "supply.html"; }
+    function transact() { window.location.href = "transact.html"; }
+    function sales() { window.location.href = "sales.html"; }
+    function control() { window.location.href = "control.html"; }
+    function settings() { window.location.href = "settings.html"; }
+
+    function openModal(id) {
+      document.getElementById(id).style.display = 'flex';
+      if (id === 'stockListModal') renderStockList();
+      if (id === 'lowStockModal') renderLowStockList();
+    }
+
+    function closeModal(id) {
+      document.getElementById(id).style.display = 'none';
+    }
+
+    function submitStock() {
+      alert("Stock added! (This is a placeholder)");
+      closeModal('addStockModal');
+    }
+
+    const stockItems = [
+      { type: 'NON VEGAN', name: 'HAM TOMATO', price: 'Php 499.00', image: 'https://c8.alamy.com/comp/RKY7M5/delicious-classic-italian-pizza-with-ham-tomatoes-and-cheese-isolated-on-white-background-RKY7M5.jpg' },
+      { type: 'NON VEGAN', name: 'HAM CHEESY', price: 'Php 449.00', image: 'https://via.placeholder.com/100' },
+      { type: 'NON VEGAN', name: 'CHEEZE DELUXE', price: 'Php 499.00', image: 'https://via.placeholder.com/100' },
+      { type: 'VEGAN', name: 'VEGGIE LOADED', price: 'Php 449.00', image: 'https://via.placeholder.com/100' },
+      { type: 'BEVERAGE', name: 'SOFT DRINK', price: 'Php 100.00', image: 'https://via.placeholder.com/100' },
+      { type: 'NON VEGAN', name: 'CHEESE LOADED', price: 'Php 399.00', image: 'https://via.placeholder.com/100' },
+      { type: 'NON VEGAN', name: 'PEPPERONI DELUXE', price: 'Php 529.00', image: 'https://via.placeholder.com/100' },
+      { type: 'NON VEGAN', name: 'MEAT LOVERS', price: 'Php 579.00', image: 'https://via.placeholder.com/100' }
+    ];
+
+    const lowStockItems = [
+      stockItems[0],
+      stockItems[3],
+      stockItems[4]
+    ];
+
+    function renderStockList() {
+      const container = document.getElementById("stock-list-container");
+      container.innerHTML = "";
+      stockItems.forEach(item => {
+        const itemDiv = document.createElement("div");
+        itemDiv.style.display = "flex";
+        itemDiv.style.alignItems = "center";
+        itemDiv.style.border = "1px solid #ccc";
+        itemDiv.style.borderRadius = "8px";
+        itemDiv.style.padding = "10px";
+        itemDiv.style.gap = "10px";
+
+        itemDiv.innerHTML = `
+          <img src="${item.image}" alt="${item.name}" style="width: 60px; height: 60px; border-radius: 5px; object-fit: cover;" />
+          <div style="display: flex; flex-direction: column;">
+            <strong>${item.name}</strong>
+            <span>${item.type}</span>
+            <span>${item.price}</span>
+          </div>
+        `;
+        container.appendChild(itemDiv);
+      });
+    }
+
+    function renderLowStockList() {
+      const container = document.getElementById("low-stock-container");
+      container.innerHTML = "";
+      lowStockItems.forEach(item => {
+        const itemDiv = document.createElement("div");
+        itemDiv.style.display = "flex";
+        itemDiv.style.alignItems = "center";
+        itemDiv.style.border = "1px solid #ffae42";
+        itemDiv.style.borderRadius = "8px";
+        itemDiv.style.padding = "10px";
+        itemDiv.style.gap = "10px";
+        itemDiv.style.backgroundColor = "#fff3e0";
+
+        itemDiv.innerHTML = `
+          <img src="${item.image}" alt="${item.name}" style="width: 60px; height: 60px; border-radius: 5px; object-fit: cover;" />
+          <div style="display: flex; flex-direction: column;">
+            <strong>${item.name}</strong>
+            <span>${item.type}</span>
+            <span>${item.price}</span>
+            <span style="color: red;">⚠️ Low in stock</span>
+          </div>
+        `;
+        container.appendChild(itemDiv);
+      });
+    }
+
+    function deleteStock() {
+      alert("Stock deleted! (This is a placeholder)");
+      closeModal('deleteStockModal');
+    }
+
+    window.onclick = function(event) {
+      const modals = document.querySelectorAll(".modal");
+      modals.forEach(modal => {
+        if (event.target === modal) {
+          modal.style.display = "none";
+        }
+      });
+    };
+  </script>
+
+</body>
+</html>

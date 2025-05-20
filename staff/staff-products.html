@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Admin Dashboard</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: #f0f0f0;
+    }
+
+    .header {
+      background: #8BC34A;
+      padding: 20px;
+      font-size: 24px;
+      color: white;
+      font-weight: bold;
+    }
+
+    .menu-container {
+      height: calc(100vh - 100px);
+      overflow-y: auto;
+      padding: 20px;
+    }
+
+    .product-card {
+      background: white;
+      border-radius: 10px;
+      padding: 15px;
+      margin-bottom: 20px;
+      display: flex;
+      align-items: center;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+
+    .product-card img {
+      width: 80px;
+      height: 80px;
+      object-fit: cover;
+      border-radius: 10px;
+      margin-right: 15px;
+    }
+
+    .product-info {
+      flex: 1;
+    }
+
+    .product-type {
+      font-weight: bold;
+      color: orange;
+    }
+
+    .product-name {
+      font-size: 16px;
+      margin: 5px 0;
+    }
+
+    .product-price {
+      color: red;
+      font-weight: bold;
+    }
+
+    .quantity-controls {
+      display: flex;
+      align-items: center;
+    }
+
+    .quantity-controls button {
+      background-color: #f44336;
+      color: white;
+      border: none;
+      border-radius: 50%;
+      width: 24px;
+      height: 24px;
+      font-size: 16px;
+      line-height: 24px;
+      text-align: center;
+      margin: 0 5px;
+    }
+
+    .quantity-controls span {
+      min-width: 20px;
+      text-align: center;
+      display: inline-block;
+    }
+
+    .goback {
+      background-color: #f44336;
+      color: white;
+      border: none;
+      margin: 20px;
+      padding: 10px 20px;
+      border-radius: 5px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+  </style>
+</head>
+<body>
+  <div class="header">Products</div>
+
+  <div>
+    <button onclick="goBack()" class="goback">← Return to Dashboard</button>
+  </div>
+
+  <div class="menu-container" id="menuContainer">
+
+    <div class="product-card">
+      <img src="https://static.vecteezy.com/system/resources/previews/030/660/317/large_2x/pizza-with-white-background-high-quality-ultra-hd-free-photo.jpg" alt="Ham Tomato" />
+      <div class="product-info">
+        <div class="product-type">NON VEGAN</div>
+        <div class="product-name">HAM TOMATO</div>
+        <div class="product-price">Php 499.00</div>
+      </div>
+      <div class="quantity-controls">
+        <button>-</button>
+        <span>0</span>
+        <button>+</button>
+      </div>
+    </div>
+
+
+    <div class="product-card">
+      <img src="https://static.vecteezy.com/system/resources/previews/030/660/301/non_2x/pizza-with-white-background-high-quality-ultra-hd-free-photo.jpg" alt="Ham Tomato" />
+      <div class="product-info">
+        <div class="product-type">NON VEGAN</div>
+        <div class="product-name">PEPPERONI</div>
+        <div class="product-price">Php 499.00</div>
+      </div>
+      <div class="quantity-controls">
+        <button>-</button>
+        <span>0</span>
+        <button>+</button>
+      </div>
+    </div>
+
+
+        <div class="product-card">
+      <img src="https://png.pngtree.com/png-vector/20220615/ourmid/pngtree-colorful-soda-cans-on-white-background-red-drink-object-vector-png-image_46345914.jpg" />
+      <div class="product-info">
+        <div class="product-type">NON VEGAN</div>
+        <div class="product-name">SODA IN CAN</div>
+        <div class="product-price">Php 499.00</div>
+      </div>
+      <div class="quantity-controls">
+        <button>-</button>
+        <span>0</span>
+        <button>+</button>
+      </div>
+    </div>
+
+        <div class="product-card">
+      <img src="https://www.shutterstock.com/image-photo/pizza-cheese-isolated-on-white-600nw-1074752555.jpg" alt="Ham Tomato" />
+      <div class="product-info">
+        <div class="product-type">NON VEGAN</div>
+        <div class="product-name">BEEF LOADED</div>
+        <div class="product-price">Php 499.00</div>
+      </div>
+      <div class="quantity-controls">
+        <button>-</button>
+        <span>0</span>
+        <button>+</button>
+      </div>
+    </div>
+
+        <div class="product-card">
+      <img src="https://healthylivingjames.co.uk/wp-content/uploads/2023/08/Gluten-Free-Pizza-Square.jpg" alt="Ham Tomato" />
+      <div class="product-info">
+        <div class="product-type">VEGAN</div>
+        <div class="product-name">VEGGIE PIZZA</div>
+        <div class="product-price">Php 499.00</div>
+      </div>
+      <div class="quantity-controls">
+        <button>-</button>
+        <span>0</span>
+        <button>+</button>
+      </div>
+    </div>
+
+        <div class="product-card">
+      <img src="https://l450v.alamy.com/450v/2h3ngf0/londonuk-october-21-2021-aluminium-can-of-coca-cola-zero-sugar-soda-drink-on-white-background-2h3ngf0.jpg" alt="Ham Tomato" />
+      <div class="product-info">
+        <div class="product-type">NON VEGAN</div>
+        <div class="product-name">COKE ZERO</div>
+        <div class="product-price">Php 89.00</div>
+      </div>
+      <div class="quantity-controls">
+        <button>-</button>
+        <span>0</span>
+        <button>+</button>
+      </div>
+    </div>
+
+        <div class="product-card">
+      <img src="https://l450v.alamy.com/450v/2epjped/coca-cola-coke-glass-bottle-1-liter-isolated-on-white-background-2epjped.jpg" alt="Ham Tomato" />
+      <div class="product-info">
+        <div class="product-type">NON VEGAN</div>
+        <div class="product-name">COKE</div>
+        <div class="product-price">Php 89.00</div>
+      </div>
+      <div class="quantity-controls">
+        <button>-</button>
+        <span>0</span>
+        <button>+</button>
+      </div>
+    </div>
+
+        <div class="product-card">
+      <img src="https://i.pinimg.com/736x/91/57/68/915768b2965c6d3600a0c541a7b26699.jpg" alt="Ham Tomato" />
+      <div class="product-info">
+        <div class="product-type">NON VEGAN</div>
+        <div class="product-name">FIZZ SODA</div>
+        <div class="product-price">Php 89.00</div>
+      </div>
+      <div class="quantity-controls">
+        <button>-</button>
+        <span>0</span>
+        <button>+</button>
+      </div>
+    </div>
+
+        <div class="product-card">
+      <img src="https://static.vecteezy.com/system/resources/previews/030/515/791/non_2x/pizza-with-bacon-and-spinach-on-white-background-photo.jpg" alt="Ham Tomato" />
+      <div class="product-info">
+        <div class="product-type">VEGAN</div>
+        <div class="product-name">SPINACH PIZZA</div>
+        <div class="product-price">Php 499.00</div>
+      </div>
+      <div class="quantity-controls">
+        <button>-</button>
+        <span>0</span>
+        <button>+</button>
+      </div>
+    </div>
+
+        <div class="product-card">
+      <img src="https://healthylivingjames.co.uk/wp-content/uploads/2023/08/Gluten-Free-Pizza-Square.jpg" alt="Ham Tomato" />
+      <div class="product-info">
+        <div class="product-type">VEGAN</div>
+        <div class="product-name">TOMATO AND LEAF PIZZA</div>
+        <div class="product-price">Php 499.00</div>
+      </div>
+      <div class="quantity-controls">
+        <button>-</button>
+        <span>0</span>
+        <button>+</button>
+      </div>
+    </div>
+
+        <div class="product-card">
+      <img src="https://c8.alamy.com/comp/2R0PTA0/raw-four-cheese-pizza-isolated-on-a-white-background-2R0PTA0.jpg" alt="Ham Tomato" />
+      <div class="product-info">
+        <div class="product-type">NON VEGAN</div>
+        <div class="product-name">CHEESE VERLOAD</div>
+        <div class="product-price">Php 499.00</div>
+      </div>
+      <div class="quantity-controls">
+        <button>-</button>
+        <span>0</span>
+        <button>+</button>
+      </div>
+    </div>
+
+        <div class="product-card">
+      <img src="https://c8.alamy.com/comp/P23NB1/ham-and-sausage-pizza-on-white-background-copy-space-recipe-and-menu-top-view-P23NB1.jpg" alt="Ham Tomato" />
+      <div class="product-info">
+        <div class="product-type">NON VEGAN</div>
+        <div class="product-name">SAUSAGE OVERLOAD</div>
+        <div class="product-price">Php 499.00</div>
+      </div>
+      <div class="quantity-controls">
+        <button>-</button>
+        <span>0</span>
+        <button>+</button>
+      </div>
+    </div>
+
+        <div class="product-card">
+      <img src="https://www.shutterstock.com/image-photo/pizza-cheese-isolated-on-white-600nw-1074752555.jpg" alt="Ham Tomato" />
+      <div class="product-info">
+        <div class="product-type">NON VEGAN</div>
+        <div class="product-name">MEATY OVERLOAD</div>
+        <div class="product-price">Php 499.00</div>
+      </div>
+      <div class="quantity-controls">
+        <button>-</button>
+        <span>0</span>
+        <button>+</button>
+      </div>
+    </div>
+
+        <div class="product-card">
+      <img src="https://healthylivingjames.co.uk/wp-content/uploads/2023/08/Gluten-Free-Pizza-Square.jpg" alt="Ham Tomato" />
+      <div class="product-info">
+        <div class="product-type">VEGAN</div>
+        <div class="product-name">ALL MUSHROOM PIZZA</div>
+        <div class="product-price">Php 499.00</div>
+      </div>
+      <div class="quantity-controls">
+        <button>-</button>
+        <span>0</span>
+        <button>+</button>
+      </div>
+    </div>
+
+    
+  </div>
+
+  <script>
+   function goBack() {
+      window.location.href = "staff-dashb.html"; // Make sure this file exists in the same directory!
+    }
+
+    const container = document.getElementById('menuContainer');
+    let isDown = false;
+    let startY;
+    let scrollTop;
+
+    container.addEventListener('touchstart', (e) => {
+      isDown = true;
+      startY = e.touches[0].pageY - container.offsetTop;
+      scrollTop = container.scrollTop;
+    });
+
+    container.addEventListener('touchend', () => {
+      isDown = false;
+    });
+
+    container.addEventListener('touchmove', (e) => {
+      if (!isDown) return;
+      e.preventDefault();
+      const y = e.touches[0].pageY - container.offsetTop;
+      const walk = (startY - y) * 1.5;
+      container.scrollTop = scrollTop + walk;
+    });
+
+  document.querySelectorAll('.quantity-controls').forEach(control => {
+    const minusBtn = control.querySelector('button:first-child');
+    const plusBtn = control.querySelector('button:last-child');
+    const counter = control.querySelector('span');
+
+    plusBtn.addEventListener('click', () => {
+      let current = parseInt(counter.textContent);
+      counter.textContent = current + 1;
+    });
+
+    minusBtn.addEventListener('click', () => {
+      let current = parseInt(counter.textContent);
+      if (current > 0) {
+        counter.textContent = current - 1;
+      }
+    });
+  });
+  </script>
+
+</body>
+</html>

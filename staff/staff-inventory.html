@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Staff Inventory</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: Arial, sans-serif; background-color: #fff; }
+
+    .wrapper {
+      display: flex;
+      min-height: 100vh;
+    }
+
+    .sidebar {
+      display: flex;
+      flex-direction: column;
+      width: 220px;
+      background-color: #328E6E;
+      padding: 20px;
+      color: #fff;
+      position: fixed;
+      top: 0;
+      left: 0;
+      bottom: 0;
+    }
+
+    .sidebar h2 { margin-bottom: 20px; }
+    .sidebar ul { list-style: none; }
+    .sidebar ul li {
+      cursor: pointer;
+      font-size: 18px;
+      padding: 10px;
+      border-radius: 5px;
+    }
+    .sidebar ul li:hover,
+    .sidebar ul li.active {
+      background-color: #fff;
+      color: #328E6E;
+      font-weight: bold;
+    }
+
+    .logout-button {
+      margin-top: auto;
+      padding: 10px;
+      background-color: #4CAF50;
+      border: none;
+      color: #fff;
+      width: 100%;
+      text-align: center;
+      cursor: pointer;
+      border-radius: 5px;
+      transition: background-color 0.3s ease;
+    }
+
+    .logout-button:hover { background-color: darkgreen; }
+
+    .main-content {
+      margin-left: 220px;
+      padding: 40px;
+      flex-grow: 1;
+      background-color: transparent;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    .header {
+      font-size: 30px;
+      color: green;
+      margin-bottom: 30px;
+    }
+
+    .card {
+      background-color: #f2f2f2;
+      border-radius: 10px;
+      box-shadow: 0 3px 3px rgba(0, 0, 0, 0.1);
+      display: flex;
+      align-items: center;
+      padding: 20px;
+      margin-bottom: 20px;
+      cursor: pointer;
+      transition: 0.2s;
+    }
+
+    .card:hover { transform: translateY(-2px); }
+
+    .card-icon {
+      font-size: 24px;
+      margin-right: 15px;
+    }
+
+    .card-text {
+      flex-grow: 1;
+      font-size: 18px;
+      font-weight: bold;
+      color: #65a45d;
+    }
+
+    .card.alert .card-text {
+      color: #f0ad4e;
+    }
+
+    .card-arrow {
+      font-size: 24px;
+      color: #65a45d;
+    }
+
+    /* Modal styles */
+    .modal {
+      display: none;
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 1000;
+    }
+
+    .modal-overlay {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.5);
+    }
+
+    .modal-content {
+      position: relative;
+      width: 400px;
+      max-width: 90%;
+      margin: 100px auto;
+      background: #fff;
+      padding: 30px;
+      border-radius: 10px;
+      z-index: 1001;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+      animation: fadeIn 0.3s ease-in-out;
+    }
+
+    .close-button {
+      position: absolute;
+      right: 15px;
+      top: 10px;
+      cursor: pointer;
+      font-size: 24px;
+      color: red;
+    }
+
+    .stock-list, .low-stock-list {
+      margin-top: 15px;
+    }
+
+    .stock-list li, .low-stock-list li {
+      padding: 5px 0;
+      border-bottom: 1px solid #ddd;
+      font-size: 16px;
+    }
+    .cls{
+      background-color: red;
+      color: white;
+      font-weight: bold;
+    }
+
+    @keyframes fadeIn {
+      from {opacity: 0; transform: translateY(-10px);}
+      to {opacity: 1; transform: translateY(0);}
+    }
+  </style>
+</head>
+<body>
+  <div class="sidebar">
+    <h2>Dashboard</h2>
+    <ul>
+      <li class="dashb" onclick="dashb()">🍕 Products</li>
+      <li class="active" onclick="inventory()">📦 Inventory</li>
+    </ul>
+    <button class="logout-button" onclick="logout()">↩️ Logout</button>
+  </div>
+
+  <main class="main-content">
+    <h1 class="header">Inventory</h1>
+
+    <div class="card" onclick="openStockModal()">
+      <div class="card-icon">📋✔️</div>
+      <div class="card-text">Stock List</div>
+      <div class="card-arrow">➡️</div>
+    </div>
+
+    <div class="card alert" onclick="openLowStockModal()">
+      <div class="card-icon">⚠️</div>
+      <div class="card-text">Low Stock Alert</div>
+      <div class="card-arrow">➡️</div>
+    </div>
+  </main>
+
+  <!-- Stock List Modal -->
+  <div class="modal" id="stockModal">
+    <div class="modal-overlay" onclick="closeStockModal()"></div>
+    <div class="modal-content">
+      <span class="close-button" onclick="closeStockModal()">×</span>
+      <h2>Stock List Info</h2>
+      <p>Here are the items currently available in stock:</p>
+      <ul class="stock-list" id="stockList"></ul>
+      <button onclick="closeStockModal()"class="cls">Close</button>
+    </div>
+  </div>
+
+  <!-- Low Stock Modal -->
+  <div class="modal" id="lowStockModal">
+    <div class="modal-overlay" onclick="closeLowStockModal()"></div>
+    <div class="modal-content">
+      <span class="close-button" onclick="closeLowStockModal()">×</span>
+      <h2>Low Stock Alert</h2>
+      <p>The following items are running low:</p>
+      <ul class="low-stock-list" id="lowStockList"></ul>
+      <button onclick="closeLowStockModal()" class="cls">Close</button>
+    </div>
+  </div>
+
+  <script>
+    function logout() {
+      window.location.href = "./../index.html";
+    }
+
+    function dashb() {
+      window.location.href = "staff-dashb.html";
+    }
+
+    function inventory() {
+      window.location.href = "staff-inventory.html";
+    }
+
+    function goTo(path) {
+      window.location.href = path;
+    }
+
+    const stockItems = [
+      { name: "Pepperoni Pizza", quantity: 12 },
+      { name: "Hawaiian Pizza", quantity: 8 },
+      { name: "Cheese Pizza", quantity: 5 },
+      { name: "Coke", quantity: 24 },
+      { name: "Sprite", quantity: 18 },
+      { name: "Fanta", quantity: 15 }
+    ];
+
+    const lowStockItems = [
+      { name: "Vegetarian Pizza", quantity: 2 },
+      { name: "Coke Zero", quantity: 1 }
+    ];
+
+    // STOCK MODAL
+    function openStockModal() {
+      renderStockList();
+      document.getElementById("stockModal").style.display = "block";
+    }
+
+    function closeStockModal() {
+      document.getElementById("stockModal").style.display = "none";
+    }
+
+    function renderStockList() {
+      const list = document.getElementById("stockList");
+      list.innerHTML = "";
+      stockItems.forEach(item => {
+        const li = document.createElement("li");
+        li.textContent = `${item.name} - ${item.quantity} in stock`;
+        list.appendChild(li);
+      });
+    }
+
+    // LOW STOCK MODAL
+    function openLowStockModal() {
+      renderLowStockList();
+      document.getElementById("lowStockModal").style.display = "block";
+    }
+
+    function closeLowStockModal() {
+      document.getElementById("lowStockModal").style.display = "none";
+    }
+
+    function renderLowStockList() {
+      const list = document.getElementById("lowStockList");
+      list.innerHTML = "";
+      lowStockItems.forEach(item => {
+        const li = document.createElement("li");
+        li.textContent = `${item.name} - only ${item.quantity} left`;
+        list.appendChild(li);
+      });
+    }
+  </script>
+</body>
+</html>

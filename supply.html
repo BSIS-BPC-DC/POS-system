@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Admin Dashboard</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: Arial, sans-serif; background-color: #fff; }
+
+    .wrapper {
+      display: flex;
+      min-height: 100vh;
+    }
+
+    .sidebar {
+      display: flex;
+      flex-direction: column;
+      width: 220px;
+      background-color: #328E6E;
+      padding: 20px;
+      color: #fff;
+      position: fixed;
+      top: 0;
+      left: 0;
+      bottom: 0;
+    }
+
+    .sidebar h2 { margin-bottom: 20px; }
+    .sidebar ul { list-style: none; }
+    .sidebar ul li {
+      cursor: pointer;
+      font-size: 18px;
+      padding: 10px;
+      border-radius: 5px;
+    }
+    .sidebar ul li:hover,
+    .sidebar ul li.active {
+      background-color: #fff;
+      color: #328E6E;
+      font-weight: bold;
+    }
+
+    .logout-button {
+      margin-top: auto;
+      padding: 10px;
+      background-color: #4CAF50;
+      border: none;
+      color: #fff;
+      width: 100%;
+      text-align: center;
+      cursor: pointer;
+      border-radius: 5px;
+      transition: background-color 0.3s ease;
+    }
+
+    .logout-button:hover { background-color: darkgreen; }
+
+    .main-content {
+      margin-left: 220px;
+      padding: 30px;
+      flex-grow: 1;
+      max-width: calc(100% - 220px);
+    }
+
+    .search-bar {
+      display: flex;
+      justify-content: center;
+      margin-bottom: 20px;
+    }
+
+    .search-bar input {
+      padding: 10px 15px;
+      border-radius: 20px;
+      border: none;
+      width: 300px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      background: #fff;
+      border-radius: 10px;
+      overflow: hidden;
+    }
+
+    th, td {
+      padding: 15px;
+      text-align: left;
+      border-bottom: 1px solid #ddd;
+    }
+
+    th {
+      background-color: #fff;
+      font-weight: bold;
+    }
+
+    .btns {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 20px;
+    }
+
+    .btns button {
+      padding: 10px 30px;
+      font-size: 16px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      color: white;
+    }
+
+    .btn-add {
+      background-color: #8bc34a;
+    }
+
+    .btn-remove {
+      background-color: #f44336;
+    }
+
+    /* Modal Styles */
+    .modal-overlay {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background: rgba(0, 0, 0, 0.5);
+      display: none;
+      justify-content: center;
+      align-items: center;
+      z-index: 1000;
+    }
+
+    .modal-content {
+      background: #fff;
+      padding: 30px;
+      border-radius: 10px;
+      min-width: 300px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.25);
+    }
+
+    .modal-buttons {
+      margin-top: 20px;
+      display: flex;
+      justify-content: space-between;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="wrapper">
+    <!-- Sidebar -->
+    <div class="sidebar">
+      <h2>Dashboard</h2>
+    <ul>
+      <li class="monitor" onclick="monitor()">🏠 Monitoring</li>
+      <li class="users">👥 Users</li>
+      <li class="products" onclick="products()">🍕 Products</li>
+      <li class="inventory" onclick="inventory()">📦 Inventory</li>
+      <li class="active" onclick="supply()">📋 Supply List</li>
+      <li class="transact" onclick="transact()">💳 Transactions</li>
+      <li class="sales" onclick="sales()">📈 Sales Report</li>
+      <li class="control" onclick="control()">🧭 Controlling</li>
+      <li class="settings" onclick="settings()">⚙️ Settings</li>
+    </ul>
+    <button class="logout-button" onclick="logout()">↩️ Logout</button>
+    </div>
+    <!-- Main Content -->
+    <div class="main-content">
+      <div class="search-bar">
+        <input type="text" id="searchInput" placeholder="Search" onkeyup="searchSupplier()">
+      </div>
+
+      <table id="supplierTable">
+        <thead>
+          <tr>
+            <th>Name</th>
+            <th>Contact</th>
+            <th>Address</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Pedro Juan</td>
+            <td>0912-345-6789</td>
+            <td>Caloocan, Metro Mla.</td>
+          </tr>
+          <tr>
+            <td>Phelimon Mamon</td>
+            <td>0912-345-6789</td>
+            <td>Caloocan, Metro Mla.</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <div class="btns">
+        <button class="btn-add" onclick="addSupplier()">Add</button>
+        <button class="btn-remove" onclick="removeSupplier()">Remove</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Add Supplier Modal -->
+  <div id="addSupplierModal" class="modal-overlay">
+    <div class="modal-content">
+      <h3>Add Supplier</h3>
+      <label>Name: <input type="text" id="modalName" /></label><br /><br />
+      <label>Contact: <input type="text" id="modalContact" /></label><br /><br />
+      <label>Address: <input type="text" id="modalAddress" /></label><br />
+      <div class="modal-buttons">
+        <button onclick="saveSupplier()">Save</button>
+        <button onclick="closeModal()">Cancel</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Delete Supplier Modal -->
+  <div id="deleteSupplierModal" class="modal-overlay">
+    <div class="modal-content">
+      <h3>Remove Supplier</h3>
+      <label>Enter Supplier Name: <input type="text" id="deleteSupplierName" /></label><br />
+      <div class="modal-buttons">
+        <button onclick="confirmRemoveSupplier()">Remove</button>
+        <button onclick="closeDeleteModal()">Cancel</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    function searchSupplier() {
+      const input = document.getElementById('searchInput').value.toLowerCase();
+      const rows = document.querySelectorAll('#supplierTable tbody tr');
+
+      rows.forEach(row => {
+        const text = row.textContent.toLowerCase();
+        row.style.display = text.includes(input) ? '' : 'none';
+      });
+    }
+
+    function addSupplier() {
+      document.getElementById('addSupplierModal').style.display = 'flex';
+    }
+
+    function closeModal() {
+      document.getElementById('addSupplierModal').style.display = 'none';
+      document.getElementById('modalName').value = '';
+      document.getElementById('modalContact').value = '';
+      document.getElementById('modalAddress').value = '';
+    }
+
+    function saveSupplier() {
+      const name = document.getElementById('modalName').value.trim();
+      const contact = document.getElementById('modalContact').value.trim();
+      const address = document.getElementById('modalAddress').value.trim();
+
+      if (!name || !contact || !address) {
+        alert("All fields are required.");
+        return;
+      }
+
+      const tableBody = document.querySelector('#supplierTable tbody');
+      const row = tableBody.insertRow();
+      row.innerHTML = `<td>${name}</td><td>${contact}</td><td>${address}</td>`;
+      closeModal();
+    }
+
+    function removeSupplier() {
+      document.getElementById('deleteSupplierModal').style.display = 'flex';
+    }
+
+    function closeDeleteModal() {
+      document.getElementById('deleteSupplierModal').style.display = 'none';
+      document.getElementById('deleteSupplierName').value = '';
+    }
+
+    function confirmRemoveSupplier() {
+      const nameToRemove = document.getElementById('deleteSupplierName').value.trim();
+      if (!nameToRemove) {
+        alert("Please enter a supplier name.");
+        return;
+      }
+
+      const rows = document.querySelectorAll('#supplierTable tbody tr');
+      let removed = false;
+
+      rows.forEach(row => {
+        const supplierName = row.cells[0].textContent.toLowerCase();
+        if (supplierName === nameToRemove.toLowerCase()) {
+          row.remove();
+          removed = true;
+        }
+      });
+
+      closeDeleteModal();
+
+      if (!removed) {
+        alert("Supplier not found.");
+      }
+    }
+
+    function logout() {
+      window.location.href = "index.html";
+    }
+
+
+    function monitor() {
+      window.location.href = "admin-dashb.html";
+    }
+
+    function products() {
+      window.location.href = "admin-products.html";
+    }
+
+    function users() {
+      window.location.href = "users.html";
+    }
+    function inventory() {
+      window.location.href = "inventory.html";
+    }
+
+
+    function supply() {
+      window.location.href = "supply.html";
+    }
+    function transact() {
+      window.location.href = "transact.html";
+    }
+    function sales() {
+      window.location.href = "sales.html";
+    }
+    function control() {
+      window.location.href = "control.html";
+    }
+    function settings() {
+      window.location.href = "settings.html";
+    }
+    
+  </script>
+
+</body>
+</html>
